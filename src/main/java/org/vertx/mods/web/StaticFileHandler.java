@@ -203,16 +203,17 @@ public class StaticFileHandler implements Handler<HttpServerRequest> {
 	 
     result = resolveModulePath(result);
 
-    if( result.equals(relativePath))
-    	result = Paths.get(webRootPrefix, relativePath).toString();
+    //System.out.println("Resolved " + relativePath + " to " + result);
     
     // index file may also be zipped
     if (zipped && fileSystem.existsSync(result + ".gz")) {
       result += ".gz";
     }
     else if ((redirect404ToIndex) && (!relativePath.equals("/"))) {
-      if( !fileSystem.existsSync(result))
+      if( !fileSystem.existsSync(result)) {
+    	System.out.println("Redirecting " + relativePath + " to index.html");
         result = getAbsoluteFilename("/", zipped);
+      }
     }
     return result;
   }
@@ -225,7 +226,7 @@ public class StaticFileHandler implements Handler<HttpServerRequest> {
           return Paths.get("mods", moduleList.get(directory), originalPath.substring(directory.length())).toString();
       }
     }      
-    return originalPath;
+    return Paths.get(webRootPrefix, originalPath).toString();
   }
 
   private long checkCacheOrFileSystem(String fileName) {
